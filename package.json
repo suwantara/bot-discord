@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
   "name": "discord",
   "version": "1.0.0",
   "description": "Discord Bot",
@@ -28,37 +27,4 @@
   "devDependencies": {
     "nodemon": "^3.1.10"
   }
-=======
-	"name": "discord-bot",
-	"version": "1.0.0",
-	"description": "Discord bot for server moderation and utilities",
-	"main": "index.js",
-	"type": "commonjs",
-	"engines": {
-		"node": ">=16.x"
-	},
-	"scripts": {
-		"start": "node index.js",
-		"dev": "nodemon index.js",
-		"build": "npm install",
-		"deploy": "node deploy.js"
-	},
-	"keywords": [
-		"discord",
-		"bot"
-	],
-	"author": "",
-	"license": "ISC",
-	"dependencies": {
-		"@discordjs/rest": "^2.6.0",
-		"discord-api-types": "^0.38.23",
-		"discord.js": "^14.22.1",
-		"dotenv": "^16.6.1",
-		"express": "^5.1.0",
-		"node-cron": "^4.2.1"
-	},
-	"devDependencies": {
-		"nodemon": "^2.0.15"
-	}
->>>>>>> b53e72a (feat: Complete Discord bot with daily message system)
 }
