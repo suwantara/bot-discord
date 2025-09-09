@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Bot Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .success-message {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .pulse-green {
+            animation: pulseGreen 2s infinite;
+        }
+
+        @keyframes pulseGreen {
+            0%, 100% { background-color: rgb(34, 197, 94); }
+            50% { background-color: rgb(22, 163, 74); }
+        }
+
+        .hover-scale:hover {
+            transform: scale(1.02);
+            transition: transform 0.2s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex items-center mb-6">
+                <div class="bg-blue-500 text-white p-3 rounded-lg mr-4">
+                    <i data-lucide="bot" class="w-8 h-8"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">Discord Bot Dashboard</h1>
+                    <p class="text-gray-600">Kelola bot Discord Anda dengan mudah</p>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <div class="border-b border-gray-200 mb-6">
+                <nav class="flex space-x-8">
+                    <button onclick="showTab('general')" class="tab-btn active py-2 px-1 border-b-2 border-blue-500 text-blue-600 font-medium">General</button>
+                    <button onclick="showTab('messages')" class="tab-btn py-2 px-1 border-b-2 text-gray-500 hover:text-gray-700">Messages</button>
+                    <button onclick="showTab('banwords')" class="tab-btn py-2 px-1 border-b-2 text-gray-500 hover:text-gray-700">Ban Words</button>
+                    <button onclick="showTab('moderation')" class="tab-btn py-2 px-1 border-b-2 text-gray-500 hover:text-gray-700">Moderation</button>
+                    <button onclick="showTab('reactionroles')" class="tab-btn py-2 px-1 border-b-2 text-gray-500 hover:text-gray-700">Reaction Roles</button>
+                    <button onclick="showTab('bannedusers')" class="tab-btn py-2 px-1 border-b-2 text-gray-500 hover:text-gray-700">Banned Users</button>
+                    <button onclick="showTab('dailymessage')" class="tab-btn py-2 px-1 border-b-2 text-gray-500 hover:text-gray-700">Daily Message</button>
+                    <button onclick="showTab('logs')" class="tab-btn py-2 px-1 border-b-2 text-gray-500 hover:text-gray-700">Logs</button>
+                </nav>
+            </div>
+
+            <!-- General Settings Tab -->
+            <div id="general" class="tab-content active fade-in">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i data-lucide="settings" class="w-5 h-5 mr-2"></i>
+                    General Settings
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Bot Prefix</label>
+                        <input type="text" id="prefix" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Welcome Channel</label>
+                        <input type="text" id="welcomeChannel" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Leave Channel</label>
+                        <input type="text" id="leaveChannel" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Log Channel</label>
+                        <input type="text" id="logChannel" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages Tab -->
+            <div id="messages" class="tab-content fade-in">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i data-lucide="message-square" class="w-5 h-5 mr-2"></i>
+                    Message Templates
+                </h2>
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Welcome Message</label>
+                        <textarea id="welcomeMessage" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Selamat datang {user} di server!"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Leave Message</label>
+                        <textarea id="leaveMessage" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="{user} telah keluar dari server."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Ban Message</label>
+                        <textarea id="banMessage" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="{user} telah dibanned karena {reason}"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ban Words Tab -->
+            <div id="banwords" class="tab-content fade-in">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i data-lucide="shield-x" class="w-5 h-5 mr-2"></i>
+                    Ban Words Management
+                </h2>
+
+                <!-- Add Word Form -->
+                <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                    <h3 class="text-lg font-medium mb-3">Add New Ban Word</h3>
+                    <div class="flex gap-2">
+                        <input type="text" id="newBanWord" placeholder="Enter word to ban" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button onclick="addBanWord()" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 flex items-center">
+                            <i data-lucide="plus" class="w-4 h-4 mr-1"></i>
+                            Add
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Ban Words Table -->
+                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                    <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                        <h3 class="text-lg font-medium">Current Ban Words</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Word</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Added</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="banWordsTable" class="bg-white divide-y divide-gray-200">
+                                <!-- Table rows will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Moderation Tab -->
+            <div id="moderation" class="tab-content fade-in">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i data-lucide="shield" class="w-5 h-5 mr-2"></i>
+                    Moderation Overview
+                </h2>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="bg-blue-500 text-white p-2 rounded-lg mr-3">
+                                <i data-lucide="users" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Total Members</p>
+                                <p id="totalMembers" class="text-2xl font-bold text-gray-800">-</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="bg-red-500 text-white p-2 rounded-lg mr-3">
+                                <i data-lucide="ban" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Banned Users</p>
+                                <p id="bannedUsers" class="text-2xl font-bold text-gray-800">-</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-yellow-50 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="bg-yellow-500 text-white p-2 rounded-lg mr-3">
+                                <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Active Warnings</p>
+                                <p id="activeWarnings" class="text-2xl font-bold text-gray-800">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Actions -->
+                <div class="bg-white border border-gray-200 rounded-lg">
+                    <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                        <h3 class="text-lg font-medium">Recent Moderation Actions</h3>
+                    </div>
+                    <div id="recentActions" class="p-4">
+                        <p class="text-gray-500">Loading recent actions...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reaction Roles Tab -->
+            <div id="reactionroles" class="tab-content fade-in">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i data-lucide="smile" class="w-5 h-5 mr-2"></i>
+                    Reaction Roles Management
+                </h2>
+
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <h3 class="text-lg font-medium text-blue-800 mb-2">How to Create Reaction Roles:</h3>
+                    <ol class="list-decimal list-inside text-blue-700 space-y-1">
+                        <li>Use <code class="bg-blue-100 px-1 rounded">/reactionroles create</code> to make a new message</li>
+                        <li>Copy the Message ID from the bot's response</li>
+                        <li>Use <code class="bg-blue-100 px-1 rounded">/reactionroles add</code> to add roles with emojis</li>
+                        <li>Users can click buttons to get/remove roles</li>
+                    </ol>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-lg">
+                    <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                        <h3 class="text-lg font-medium">Current Reaction Role Messages</h3>
+                    </div>
+                    <div id="reactionRolesList" class="p-4">
+                        <p class="text-gray-500">Loading reaction roles...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Banned Users Tab -->
+            <div id="bannedusers" class="tab-content fade-in">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i data-lucide="user-x" class="w-5 h-5 mr-2"></i>
+                    Banned Users Management
+                </h2>
+
+                <!-- Unban User Form -->
+                <div class="bg-red-50 p-4 rounded-lg mb-6">
+                    <h3 class="text-lg font-medium mb-3 text-red-800">Unban User</h3>
+                    <div class="flex gap-2">
+                        <input type="text" id="unbanUserId" placeholder="Enter User ID to unban" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="unbanReason" placeholder="Reason (optional)" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <button onclick="unbanUser()" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 flex items-center">
+                            <i data-lucide="user-check" class="w-4 h-4 mr-1"></i>
+                            Unban
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Banned Users Table -->
+                <div class="bg-white border border-gray-200 rounded-lg">
+                    <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                        <h3 class="text-lg font-medium">Current Banned Users</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Banned By</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bannedUsersTable" class="bg-white divide-y divide-gray-200">
+                                <!-- Table rows will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Message Tab -->
+            <div id="dailymessage" class="tab-content fade-in">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i data-lucide="sun" class="w-5 h-5 mr-2"></i>
+                    Daily Message System
+                </h2>
+
+                <!-- Status Card -->
+                <div class="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-6 mb-6">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-yellow-500 text-white p-3 rounded-full mr-4">
+                            <i data-lucide="sun" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-yellow-800">🌅 Daily Message Active</h3>
+                            <p class="text-yellow-700">Bot akan mengirim pesan selamat pagi setiap hari</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white p-4 rounded-lg border border-yellow-200">
+                            <div class="flex items-center">
+                                <i data-lucide="clock" class="w-5 h-5 text-yellow-600 mr-2"></i>
+                                <div>
+                                    <p class="text-sm text-gray-600">Jadwal</p>
+                                    <p class="font-semibold text-gray-800">06:00 WIB</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border border-yellow-200">
+                            <div class="flex items-center">
+                                <i data-lucide="hash" class="w-5 h-5 text-yellow-600 mr-2"></i>
+                                <div>
+                                    <p class="text-sm text-gray-600">Channel</p>
+                                    <p id="dailyChannelDisplay" class="font-semibold text-gray-800">Loading...</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border border-yellow-200">
+                            <div class="flex items-center">
+                                <i data-lucide="zap" class="w-5 h-5 text-yellow-600 mr-2"></i>
+                                <div>
+                                    <p class="text-sm text-gray-600">Status</p>
+                                    <p class="font-semibold text-green-600">✅ Active</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Set Channel Form -->
+                <div class="bg-blue-50 p-4 rounded-lg mb-6">
+                    <h3 class="text-lg font-medium mb-3 text-blue-800">⚙️ Konfigurasi Channel Daily Message</h3>
+                    <div class="flex gap-2">
+                        <input type="text" id="dailyChannelInput" placeholder="Masukkan nama channel (contoh: general)" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button onclick="setDailyChannel()" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 flex items-center">
+                            <i data-lucide="settings" class="w-4 h-4 mr-1"></i>
+                            Set Channel
+                        </button>
+                    </div>
+                    <p class="text-sm text-blue-600 mt-2">
+                        💡 Gunakan command <code class="bg-blue-100 px-1 rounded">/setdailymessage</code> di Discord untuk mengatur channel dengan lebih mudah
+                    </p>
+                </div>
+
+                <!-- Test Message -->
+                <div class="bg-green-50 p-4 rounded-lg mb-6">
+                    <h3 class="text-lg font-medium mb-3 text-green-800">🧪 Test Daily Message</h3>
+                    <p class="text-green-700 mb-3">Kirim pesan test untuk melihat bagaimana daily message akan terlihat:</p>
+                    <button onclick="sendTestDailyMessage()" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 flex items-center">
+                        <i data-lucide="send" class="w-4 h-4 mr-1"></i>
+                        Kirim Test Message
+                    </button>
+                </div>
+
+                <!-- Message Preview -->
+                <div class="bg-white border border-gray-200 rounded-lg p-6">
+                    <h3 class="text-lg font-medium mb-4 text-gray-800">👀 Preview Daily Message</h3>
+                    <div class="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-yellow-500 text-white p-2 rounded-lg">
+                                <i data-lucide="sun" class="w-5 h-5"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-yellow-800">🌅 Selamat Pagi!</h4>
+                                <p class="text-yellow-700 mt-1">
+                                    <strong>Halo teman-teman!</strong><br>
+                                    Semoga hari ini penuh dengan kebahagiaan dan produktivitas! 🚀
+                                </p>
+                                <div class="mt-3 grid grid-cols-3 gap-2 text-sm">
+                                    <div class="bg-white p-2 rounded text-center">
+                                        <div class="font-semibold text-gray-800">Senin</div>
+                                        <div class="text-gray-600">9 September 2025</div>
+                                    </div>
+                                    <div class="bg-white p-2 rounded text-center">
+                                        <div class="font-semibold text-gray-800">06:00</div>
+                                        <div class="text-gray-600">WIB</div>
+                                    </div>
+                                    <div class="bg-white p-2 rounded text-center">
+                                        <div class="font-semibold text-green-600">✅ Online</div>
+                                        <div class="text-gray-600">Status Bot</div>
+                                    </div>
+                                </div>
+                                <div class="mt-3 text-xs text-yellow-600">
+                                    Ancestral Hall • Auto-moderation & Announcement System
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logs Tab -->
+            <div id="logs" class="tab-content fade-in">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i data-lucide="file-text" class="w-5 h-5 mr-2"></i>
+                    System Logs
+                </h2>
+
+                <div class="mb-4 flex gap-2">
+                    <select id="logLevel" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="all">All Levels</option>
+                        <option value="INFO">Info</option>
+                        <option value="WARN">Warning</option>
+                        <option value="ERROR">Error</option>
+                    </select>
+                    <input type="number" id="logLines" value="20" min="1" max="100" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-20">
+                    <button onclick="loadLogs()" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                        Load Logs
+                    </button>
+                </div>
+
+                <div class="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm overflow-x-auto max-h-96">
+                    <pre id="logsContent">Loading logs...</pre>
+                </div>
+            </div>
+
+            <!-- Status Messages -->
+            <div id="statusMessages" class="fixed top-4 right-4 z-50"></div>
+
+            <!-- Save Button -->
+            <div class="mt-8 flex justify-between items-center">
+                <div class="text-sm text-gray-600">
+                    <i data-lucide="info" class="w-4 h-4 inline mr-1"></i>
+                    Changes are saved automatically to the bot configuration
+                </div>
+                <button onclick="saveConfig()" class="bg-green-500 text-white px-6 py-3 rounded-md hover:bg-green-600 flex items-center font-medium hover-scale pulse-green">
+                    <i data-lucide="save" class="w-5 h-5 mr-2"></i>
+                    Save All Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'text-blue-600', 'border-blue-500');
+                btn.classList.add('text-gray-500');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to selected tab button
+            event.target.classList.add('active', 'text-blue-600', 'border-blue-500');
+            event.target.classList.remove('text-gray-500');
+        }
+
+        // Load configuration
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/config');
+                const config = await response.json();
+
+                // General settings
+                document.getElementById('prefix').value = config.prefix || '-';
+                document.getElementById('welcomeChannel').value = config.welcomeChannel || 'welcome';
+                document.getElementById('leaveChannel').value = config.leaveChannel || 'goodbye';
+                document.getElementById('logChannel').value = config.logChannel || 'logs';
+
+                // Messages
+                document.getElementById('welcomeMessage').value = config.announcements?.welcome || '';
+                document.getElementById('leaveMessage').value = config.announcements?.leave || '';
+                document.getElementById('banMessage').value = config.announcements?.ban || '';
+
+                // Ban words
+                updateBanWordsTable(config.banWords || []);
+
+                console.log('Configuration loaded successfully');
+            } catch (error) {
+                console.error('Failed to load configuration:', error);
+            }
+        }
+
+        // Update ban words table
+        function updateBanWordsTable(banWords) {
+            const tableBody = document.getElementById('banWordsTable');
+            tableBody.innerHTML = '';
+
+            if (banWords.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-gray-500">No banned words found</td></tr>';
+                return;
+            }
+
+            banWords.forEach((word, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${word}</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">Recently</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="removeBanWord('${word}')" class="text-red-600 hover:text-red-900">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            // Re-initialize Lucide icons for new elements
+            lucide.createIcons();
+        }
+
+        // Add ban word
+        async function addBanWord() {
+            const wordInput = document.getElementById('newBanWord');
+            const word = wordInput.value.trim().toLowerCase();
+
+            if (!word) {
+                alert('Please enter a word to ban');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/config');
+                const config = await response.json();
+
+                if (!config.banWords) config.banWords = [];
+                if (config.banWords.includes(word)) {
+                    alert('This word is already banned!');
+                    return;
+                }
+
+                config.banWords.push(word);
+
+                const saveResponse = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+
+                if (saveResponse.ok) {
+                    wordInput.value = '';
+                    updateBanWordsTable(config.banWords);
+                    alert('Ban word added successfully!');
+                } else {
+                    alert('Failed to add ban word!');
+                }
+            } catch (error) {
+                console.error('Error adding ban word:', error);
+                alert('Error adding ban word!');
+            }
+        }
+
+        // Remove ban word
+        async function removeBanWord(word) {
+            if (!confirm(`Are you sure you want to remove "${word}" from banned words?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/config');
+                const config = await response.json();
+
+                config.banWords = config.banWords.filter(w => w !== word);
+
+                const saveResponse = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+
+                if (saveResponse.ok) {
+                    updateBanWordsTable(config.banWords);
+                    alert('Ban word removed successfully!');
+                } else {
+                    alert('Failed to remove ban word!');
+                }
+            } catch (error) {
+                console.error('Error removing ban word:', error);
+                alert('Error removing ban word!');
+            }
+        }
+
+        // Load logs
+        async function loadLogs() {
+            const lines = document.getElementById('logLines').value;
+            const level = document.getElementById('logLevel').value;
+
+            try {
+                const response = await fetch(`/api/logs?lines=${lines}&level=${level}`);
+                if (response.ok) {
+                    const logs = await response.text();
+                    document.getElementById('logsContent').textContent = logs;
+                } else {
+                    document.getElementById('logsContent').textContent = 'Failed to load logs';
+                }
+            } catch (error) {
+                document.getElementById('logsContent').textContent = 'Error loading logs: ' + error.message;
+            }
+        }
+
+        // Save configuration
+        async function saveConfig() {
+            const config = {
+                prefix: document.getElementById('prefix').value,
+                welcomeChannel: document.getElementById('welcomeChannel').value,
+                leaveChannel: document.getElementById('leaveChannel').value,
+                logChannel: document.getElementById('logChannel').value,
+                announcements: {
+                    welcome: document.getElementById('welcomeMessage').value,
+                    leave: document.getElementById('leaveMessage').value,
+                    ban: document.getElementById('banMessage').value
+                },
+                reactionRoles: {} // Keep existing
+            };
+
+            // Get current ban words
+            const response = await fetch('/api/config');
+            const currentConfig = await response.json();
+            config.banWords = currentConfig.banWords || [];
+
+            try {
+                const saveResponse = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+
+                if (saveResponse.ok) {
+                    showSuccessMessage('✅ All changes saved successfully!');
+                } else {
+                    showErrorMessage('❌ Failed to save changes!');
+                }
+            } catch (error) {
+                console.error('Error saving configuration:', error);
+                alert('❌ Error saving configuration!');
+            }
+        }
+
+        // Load stats
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const stats = await response.json();
+
+                document.getElementById('totalMembers').textContent = stats.totalMembers || 0;
+                document.getElementById('bannedUsers').textContent = stats.bannedUsers || 0;
+                document.getElementById('activeWarnings').textContent = stats.activeWarnings || 0;
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        // Load recent actions (simplified version)
+        async function loadRecentActions() {
+            try {
+                const response = await fetch('/api/logs?lines=5&level=all');
+                const data = await response.json();
+
+                const actionsDiv = document.getElementById('recentActions');
+                if (data.logs && data.logs !== 'No logs found.') {
+                    const logs = data.logs.split('\n').slice(0, 5);
+                    actionsDiv.innerHTML = logs.map(log => `<div class="py-2 border-b border-gray-100 last:border-b-0">${log}</div>`).join('');
+                } else {
+                    actionsDiv.innerHTML = '<p class="text-gray-500">No recent actions found</p>';
+                }
+            } catch (error) {
+                console.error('Failed to load recent actions:', error);
+                document.getElementById('recentActions').innerHTML = '<p class="text-gray-500">Failed to load recent actions</p>';
+            }
+        }
+
+        // Unban user
+        async function unbanUser() {
+            const userId = document.getElementById('unbanUserId').value.trim();
+            const reason = document.getElementById('unbanReason').value.trim();
+
+            if (!userId) {
+                alert('Please enter a User ID to unban');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to unban user ${userId}?`)) {
+                return;
+            }
+
+            try {
+                // This would need a backend endpoint for unbanning
+                // For now, we'll show a message
+                alert('Unban functionality would require backend implementation. Use /unban command in Discord instead.');
+            } catch (error) {
+                console.error('Error unbanning user:', error);
+                alert('Error unbanning user!');
+            }
+        }
+
+        // Load banned users
+        async function loadBannedUsers() {
+            try {
+                // This would fetch from backend - for now show placeholder
+                const tableBody = document.getElementById('bannedUsersTable');
+                tableBody.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-gray-500">Use /ban and /unban commands in Discord to manage bans</td></tr>';
+            } catch (error) {
+                console.error('Failed to load banned users:', error);
+            }
+        }
+
+        // Load reaction roles
+        async function loadReactionRoles() {
+            try {
+                const response = await fetch('/api/config');
+                const config = await response.json();
+
+                const rolesDiv = document.getElementById('reactionRolesList');
+                const reactionRoles = config.reactionRoles || {};
+
+                if (Object.keys(reactionRoles).length === 0) {
+                    rolesDiv.innerHTML = '<p class="text-gray-500">No reaction role messages found. Create one using /reactionroles create</p>';
+                    return;
+                }
+
+                let html = '<div class="space-y-4">';
+                for (const [messageId, roles] of Object.entries(reactionRoles)) {
+                    html += `
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <h4 class="font-medium text-gray-800 mb-2">Message ID: <code class="bg-gray-100 px-2 py-1 rounded text-sm">${messageId}</code></h4>
+                            <div class="flex flex-wrap gap-2">
+                    `;
+
+                    for (const [emoji, roleId] of Object.entries(roles)) {
+                        html += `<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">${emoji} Role ID: ${roleId}</span>`;
+                    }
+
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                }
+                html += '</div>';
+
+                rolesDiv.innerHTML = html;
+            } catch (error) {
+                console.error('Failed to load reaction roles:', error);
+                document.getElementById('reactionRolesList').innerHTML = '<p class="text-gray-500">Failed to load reaction roles</p>';
+            }
+        }
+
+        // Show success message
+        function showSuccessMessage(message) {
+            const statusDiv = document.getElementById('statusMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'bg-green-500 text-white px-4 py-2 rounded-md mb-2 success-message flex items-center';
+            messageDiv.innerHTML = `
+                <i data-lucide="check-circle" class="w-4 h-4 mr-2"></i>
+                ${message}
+            `;
+            statusDiv.appendChild(messageDiv);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+        // Show error message
+        function showErrorMessage(message) {
+            const statusDiv = document.getElementById('statusMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'bg-red-500 text-white px-4 py-2 rounded-md mb-2 success-message flex items-center';
+            messageDiv.innerHTML = `
+                <i data-lucide="x-circle" class="w-4 h-4 mr-2"></i>
+                ${message}
+            `;
+            statusDiv.appendChild(messageDiv);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+        // Auto-refresh data every 30 seconds
+        setInterval(() => {
+            loadStats();
+            loadRecentActions();
+        }, 30000);
+
+        // Set daily message channel
+        async function setDailyChannel() {
+            const channelName = document.getElementById('dailyChannelInput').value.trim();
+
+            if (!channelName) {
+                alert('Please enter a channel name');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/config');
+                const config = await response.json();
+
+                config.dailyMessageChannel = channelName;
+
+                const saveResponse = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+
+                if (saveResponse.ok) {
+                    document.getElementById('dailyChannelInput').value = '';
+                    document.getElementById('dailyChannelDisplay').textContent = channelName;
+                    showSuccessMessage('✅ Daily message channel updated successfully!');
+                } else {
+                    showErrorMessage('❌ Failed to update daily message channel!');
+                }
+            } catch (error) {
+                console.error('Error setting daily channel:', error);
+                showErrorMessage('❌ Error updating daily message channel!');
+            }
+        }
+
+        // Send test daily message
+        async function sendTestDailyMessage() {
+            if (!confirm('This will send a test daily message to the configured channel. Continue?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/test-daily-message', {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    showSuccessMessage('✅ Test daily message sent successfully!');
+                } else {
+                    const errorData = await response.json();
+                    showErrorMessage(`❌ Failed to send test message: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error('Error sending test daily message:', error);
+                showErrorMessage('❌ Error sending test daily message!');
+            }
+        }
+
+        // Load daily message channel
+        async function loadDailyChannel() {
+            try {
+                const response = await fetch('/api/config');
+                const config = await response.json();
+                const channelName = config.dailyMessageChannel || 'general';
+                document.getElementById('dailyChannelDisplay').textContent = channelName;
+            } catch (error) {
+                console.error('Error loading daily channel:', error);
+                document.getElementById('dailyChannelDisplay').textContent = 'Error loading';
+            }
+        }
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadConfig();
+            loadStats();
+            loadRecentActions();
+            loadBannedUsers();
+            loadReactionRoles();
+            loadDailyChannel(); // Load daily message channel
+            lucide.createIcons();
+
+            // Show welcome message
+            setTimeout(() => {
+                showSuccessMessage('Dashboard loaded successfully! 🎉');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

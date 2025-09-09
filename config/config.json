@@ -1,0 +1,18 @@
+{
+  "prefix": "-",
+  "welcomeChannel": "welcome",
+  "leaveChannel": "goodbye",
+  "logChannel": "logs",
+  "banWords": [
+    "badword1",
+    "badword2",
+    "shit"
+  ],
+  "dailyMessageChannel": "1263384288301154405",
+  "reactionRoles": {},
+  "announcements": {
+    "welcome": "Selamat datang {user} di server!",
+    "leave": "{user} telah keluar dari server.",
+    "ban": "{user} telah dibanned karena {reason}"
+  }
+}
