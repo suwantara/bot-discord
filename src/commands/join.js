@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { joinVoiceChannel, entersState, VoiceConnectionStatus } = require('@discordjs/voice');
 const logger = require('../utils/logger');
+const { startKeepAlive } = require('../utils/voiceManager');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -25,6 +26,9 @@ module.exports = {
 
       // Wait for the connection to become ready
       await entersState(connection, VoiceConnectionStatus.Ready, 30_000);
+
+      // Start centralized keep-alive manager which will attempt rejoin when needed
+      startKeepAlive(voiceChannel.guild.id, voiceChannel.id, voiceChannel.guild.voiceAdapterCreator);
 
       await interaction.reply({ content: `Joined ${voiceChannel.name}`, ephemeral: false });
 

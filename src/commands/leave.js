@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { getVoiceConnection } = require('@discordjs/voice');
 const logger = require('../utils/logger');
+const { stopKeepAlive } = require('../utils/voiceManager');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -21,6 +22,8 @@ module.exports = {
     }
 
     try {
+      // Stop centralized keep-alive for this guild then destroy connection
+      stopKeepAlive(guild.id);
       connection.destroy();
       await interaction.reply({ content: 'Left the voice channel.', ephemeral: false });
 
